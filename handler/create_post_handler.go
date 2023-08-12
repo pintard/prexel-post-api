@@ -2,12 +2,10 @@ package handler
 
 import (
 	"encoding/json"
-	"fmt"
 	"io"
-	"math/rand"
 	"net/http"
-	. "prexel-post-api/data"
 	. "prexel-post-api/model"
+	"time"
 )
 
 func CreatePostHandler(w http.ResponseWriter, r *http.Request) {
@@ -27,11 +25,8 @@ func CreatePostHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	post.UUID = rand.Int63()
-	Posts[post.UUID] = post
-
-	fmt.Println("Post", post)
-	fmt.Println("Posts", Posts)
+	// TODO Call repository function
+	post.Date = time.Now()
 
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(post)

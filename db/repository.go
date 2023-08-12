@@ -7,42 +7,49 @@ import (
 )
 
 func CreatePost(post PrexelPost) (int64, error) {
-	query := `INSERT INTO prexelposts (username, contact, content) VALUES ($1, $2, $3) RETURNING uuid;`
+	query := `INSERT INTO prexelposts (username, contact, code, date) VALUES ($1, $2, $3, $4) RETURNING uuid;`
 	var uuid int64
-	err := DB.QueryRow(query, post.Username, post.Contact, post.Content).Scan(&uuid)
+	err := DB.QueryRow(query, post.Username, post.Contact, post.Code, post.Date).Scan(&uuid)
+
 	if err != nil {
 		return 0, err
 	}
+
 	return uuid, nil
 }
 
 func GetPost(uuid int64) (PrexelPost, error) {
-	query := `SELECT uuid, username, contact, content FROM prexelposts WHERE uuid=$1;`
+	query := `SELECT uuid, username, contact, code, date FROM prexelposts WHERE uuid=$1;`
 	var post PrexelPost
-	err := DB.QueryRow(query, uuid).Scan(&post.UUID, &post.Username, &post.Contact, &post.Content)
+	err := DB.QueryRow(query, uuid).Scan(&post.UUID, &post.Username, &post.Contact, &post.Code, &post.Date)
+
 	if err != nil {
 		if err == sql.ErrNoRows {
 			return PrexelPost{}, errors.New("post not found")
 		}
 		return PrexelPost{}, err
 	}
+
 	return post, nil
 }
 
-func GetAllPosts() ([]PrexelPost, error) {
-	query := `SELECT uuid, username, contact, content FROM prexelposts;`
-	rows, err := DB.Query(query)
+func PollPosts(lastUUID int64, limit int) ([]PrexelPost, error) {
+	query := `SELECT uuid, username, contact, content, date FROM prexelposts WHERE uuid > $1 ORDER BY uuid ASC LIMIT $2;`
+	rows, err := DB.Query(query, lastUUID, limit)
+
 	if err != nil {
 		return nil, err
 	}
-	defer rows.Close()
 
+	defer rows.Close()
 	var posts []PrexelPost
+
 	for rows.Next() {
 		var post PrexelPost
-		if err := rows.Scan(&post.UUID, &post.Username, &post.Contact, &post.Content); err != nil {
+		if err := rows.Scan(&post.UUID, &post.Username, &post.Contact, &post.Code); err != nil {
 			return nil, err
 		}
+
 		posts = append(posts, post)
 	}
 
