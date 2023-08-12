@@ -2,6 +2,7 @@ package handler
 
 import (
 	"encoding/json"
+	"fmt"
 	"io"
 	"math/rand"
 	"net/http"
@@ -28,6 +29,9 @@ func CreatePostHandler(w http.ResponseWriter, r *http.Request) {
 
 	post.UUID = rand.Int63()
 	Posts[post.UUID] = post
+
+	fmt.Println("Post", post)
+	fmt.Println("Posts", Posts)
 
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(post)
