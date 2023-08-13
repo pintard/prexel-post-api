@@ -32,5 +32,7 @@ func main() {
 	router.HandleFunc("/posts", GetPostsHandler).Methods("GET")
 	router.HandleFunc("/posts/{uuid:[0-9]+}", GetPostHandler).Methods("GET")
 
-	http.ListenAndServe(":8080", router)
+	serverPort := ":8080"
+	log.Printf("Server is starting and listening on port %s", serverPort)
+	http.ListenAndServe(serverPort, router)
 }
