@@ -1,8 +1,8 @@
 package main
 
 import (
-	"log"
 	"net/http"
+	"os"
 	"prexel-post-api/db"
 	. "prexel-post-api/handler"
 	. "prexel-post-api/utils"
@@ -18,11 +18,14 @@ var (
 	password = GetEnv("DB_PASSWORD", "password")
 )
 
+var log *Logger = GetLoggerInstance()
+
 func main() {
 	var err error = db.Connect(host, port, user, password, dbname)
 
 	if err != nil {
-		log.Fatalf("Error connecting to the database: %v", err)
+		log.Error("Error connecting to the database: " + err.Error())
+		os.Exit(1)
 	}
 
 	defer db.DB.Close()
@@ -33,6 +36,6 @@ func main() {
 	router.HandleFunc("/posts/{uuid:[0-9]+}", GetPostHandler).Methods("GET")
 
 	serverPort := ":8080"
-	log.Printf("Server is starting and listening on port %s", serverPort)
+	log.Info("Server is starting and listening on port " + serverPort)
 	http.ListenAndServe(serverPort, router)
 }

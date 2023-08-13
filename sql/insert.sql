@@ -1,3 +1,4 @@
+-- @block
 INSERT INTO prexelposts (username, contact, code)
 VALUES (
         'john_doe',

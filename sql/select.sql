@@ -1,3 +1,4 @@
+-- @block
 -- Select all
 SELECT *
 FROM prexelposts
