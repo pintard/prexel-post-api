@@ -33,9 +33,18 @@ func GetPost(uuid int64) (PrexelPost, error) {
 	return post, nil
 }
 
-func PollPosts(lastUUID int64, limit int) ([]PrexelPost, error) {
-	query := `SELECT uuid, username, contact, content, date FROM prexelposts WHERE uuid > $1 ORDER BY uuid ASC LIMIT $2;`
-	rows, err := DB.Query(query, lastUUID, limit)
+func PollPosts(lastUUID *int64, limit int) ([]PrexelPost, error) {
+	var query string
+	var rows *sql.Rows
+	var err error
+
+	if lastUUID != nil {
+		query = `SELECT uuid, username, contact, content, date FROM prexelposts WHERE uuid > $1 ORDER BY uuid ASC LIMIT $2;`
+		rows, err = DB.Query(query, *lastUUID, limit)
+	} else {
+		query = `SELECT uuid, username, contact, content, date FROM prexelposts ORDER BY uuid ASC LIMIT $1;`
+		rows, err = DB.Query(query, limit)
+	}
 
 	if err != nil {
 		return nil, err
