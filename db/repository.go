@@ -7,8 +7,8 @@ import (
 )
 
 func CreatePost(post PrexelPost) (int64, error) {
-	query := `INSERT INTO prexelposts (username, contact, code, date) VALUES ($1, $2, $3, $4) RETURNING uuid;`
 	var uuid int64
+	query := `INSERT INTO prexelposts (username, contact, code, date) VALUES ($1, $2, $3, $4) RETURNING uuid;`
 	err := DB.QueryRow(query, post.Username, post.Contact, post.Code, post.Date).Scan(&uuid)
 
 	if err != nil {
@@ -19,8 +19,8 @@ func CreatePost(post PrexelPost) (int64, error) {
 }
 
 func GetPost(uuid int64) (PrexelPost, error) {
-	query := `SELECT uuid, username, contact, code, date FROM prexelposts WHERE uuid=$1;`
 	var post PrexelPost
+	query := `SELECT uuid, username, contact, code, date FROM prexelposts WHERE uuid=$1;`
 	err := DB.QueryRow(query, uuid).Scan(&post.UUID, &post.Username, &post.Contact, &post.Code, &post.Date)
 
 	if err != nil {

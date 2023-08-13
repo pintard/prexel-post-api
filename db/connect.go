@@ -8,8 +8,7 @@ import (
 
 var DB *sql.DB
 
-func Connect(host string, port string, user string, password string, dbname string) error {
-	var err error
+func Connect(host string, port string, user string, password string, dbname string) (err error) {
 	var psqlInfo string = fmt.Sprintf("host=%s port=%s user=%s password=%s dbname=%s sslmode=disable",
 		host,
 		port,
@@ -29,5 +28,5 @@ func Connect(host string, port string, user string, password string, dbname stri
 		log.Fatal(err)
 	}
 
-	return err
+	return
 }

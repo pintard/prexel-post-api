@@ -3,9 +3,8 @@ package handler
 import (
 	"encoding/json"
 	"net/http"
+	"prexel-post-api/db"
 	"strconv"
-
-	. "prexel-post-api/model"
 
 	"github.com/gorilla/mux"
 )
@@ -19,13 +18,10 @@ func GetPostHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	var post PrexelPost
-	var exists bool
-	println(uuid)
-	// post, exists := Posts[uuid]
+	post, err := db.GetPost(uuid)
 
-	if !exists {
-		http.Error(w, "Post not found", http.StatusNotFound)
+	if err != nil {
+		http.Error(w, "Failed to find Post by that UUID", http.StatusBadRequest)
 		return
 	}
 

@@ -1,0 +1,33 @@
+version: '3.8'
+
+services:
+  web:
+    build: .
+    ports:
+      - "8080:8080"
+    links:
+      - db
+    environment:
+      DB_HOST: db
+ 
+  db:
+    image: postgres:latest
+    restart: always
+    environment:
+      POSTGRES_DB: prexelpostdb
+      POSTGRES_USER: prexeluser
+      POSTGRES_PASSWORD: your_password
+    ports:
+      - "5432:5432"
+  
+  pgadmin:
+    container_name: pgadmin4
+    image: dpage/pgadmin4
+    restart: always
+    environment:
+      PGADMIN_DEFAULT_PASSWORD: 
+    ports:
+      - "5050:80"
+
+volumes:
+  pgdata:

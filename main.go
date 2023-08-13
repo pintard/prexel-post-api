@@ -3,7 +3,6 @@ package main
 import (
 	"log"
 	"net/http"
-
 	"prexel-post-api/db"
 	. "prexel-post-api/handler"
 	. "prexel-post-api/utils"
@@ -20,7 +19,7 @@ var (
 )
 
 func main() {
-	err := db.Connect(host, port, user, password, dbname)
+	var err error = db.Connect(host, port, user, password, dbname)
 
 	if err != nil {
 		log.Fatalf("Error connecting to the database: %v", err)
@@ -32,5 +31,6 @@ func main() {
 	router.HandleFunc("/posts", CreatePostHandler).Methods("POST")
 	router.HandleFunc("/posts", GetPostsHandler).Methods("GET")
 	router.HandleFunc("/posts/{uuid:[0-9]+}", GetPostHandler).Methods("GET")
+
 	http.ListenAndServe(":8080", router)
 }

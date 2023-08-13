@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"io"
 	"net/http"
+	"prexel-post-api/db"
 	. "prexel-post-api/model"
 	"time"
 )
@@ -25,8 +26,15 @@ func CreatePostHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// TODO Call repository function
 	post.Date = time.Now()
+	uuid, err := db.CreatePost(post)
+
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	post.UUID = uuid
 
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(post)
