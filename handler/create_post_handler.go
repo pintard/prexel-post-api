@@ -11,24 +11,24 @@ import (
 
 func CreatePostHandler(w http.ResponseWriter, r *http.Request) {
 	var post PrexelPost
-	body, err := io.ReadAll(r.Body)
 
+	body, err := io.ReadAll(r.Body)
 	if err != nil {
 		http.Error(w, "Failed to read body", http.StatusBadRequest)
 		return
 	}
 
 	defer r.Body.Close()
-	err = json.Unmarshal(body, &post)
 
+	err = json.Unmarshal(body, &post)
 	if err != nil {
 		http.Error(w, "Failed to parse JSON", http.StatusBadRequest)
 		return
 	}
 
 	post.Date = time.Now()
-	uuid, err := db.CreatePost(post)
 
+	uuid, err := db.CreatePost(post)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return

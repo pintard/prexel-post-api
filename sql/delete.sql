@@ -1,0 +1,2 @@
+-- Reset Table
+TRUNCATE TABLE prexelposts RESTART IDENTITY CASCADE;

@@ -15,7 +15,7 @@ var (
 	port     = GetEnv("DB_PORT", "5432")
 	dbname   = GetEnv("DB_NAME", "prexelpostdb")
 	user     = GetEnv("DB_USER", "prexeluser")
-	password = GetEnv("DB_PASSWORD", "your_password")
+	password = GetEnv("DB_PASSWORD", "password")
 )
 
 func main() {
