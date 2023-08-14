@@ -12,15 +12,15 @@ import (
 func GetPostHandler(w http.ResponseWriter, r *http.Request) {
 	var vars map[string]string = mux.Vars(r)
 
-	uuid, err := strconv.ParseInt(vars["uuid"], 10, 64)
+	id, err := strconv.ParseInt(vars["id"], 10, 64)
 	if err != nil {
-		http.Error(w, "Invalid UUID format", http.StatusBadRequest)
+		http.Error(w, "Invalid ID format", http.StatusBadRequest)
 		return
 	}
 
-	post, err := db.GetPost(uuid)
+	post, err := db.GetPost(id)
 	if err != nil {
-		http.Error(w, "Failed to find Post by that UUID", http.StatusBadRequest)
+		http.Error(w, "Failed to find Post by that ID", http.StatusBadRequest)
 		return
 	}
 

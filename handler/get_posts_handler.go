@@ -10,16 +10,16 @@ import (
 
 func GetPostsHandler(w http.ResponseWriter, r *http.Request) {
 	var queryValues url.Values = r.URL.Query()
-	var lastUUID *int64
+	var lastID *int64
 
-	lastUUIDStr, ok := queryValues["lastUUID"]
-	if ok && len(lastUUIDStr) > 0 {
-		parsedUUID, err := strconv.ParseInt(lastUUIDStr[0], 10, 64)
+	lastIDStr, ok := queryValues["lastID"]
+	if ok && len(lastIDStr) > 0 {
+		parsedID, err := strconv.ParseInt(lastIDStr[0], 10, 64)
 		if err != nil {
-			http.Error(w, "Invalid 'lastUUID' parameter", http.StatusBadRequest)
+			http.Error(w, "Invalid 'lastID' parameter", http.StatusBadRequest)
 			return
 		}
-		lastUUID = &parsedUUID
+		lastID = &parsedID
 	}
 
 	limitStr, ok := queryValues["limit"]
@@ -34,7 +34,7 @@ func GetPostsHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	posts, err := db.PollPosts(lastUUID, limit)
+	posts, err := db.PollPosts(lastID, limit)
 	if err != nil {
 		http.Error(w, "Error retrieving posts", http.StatusInternalServerError)
 		return

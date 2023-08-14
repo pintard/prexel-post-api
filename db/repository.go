@@ -7,21 +7,21 @@ import (
 )
 
 func CreatePost(post PrexelPost) (int64, error) {
-	var uuid int64
-	query := `INSERT INTO prexelposts (username, contact, code, date) VALUES ($1, $2, $3, $4) RETURNING uuid;`
-	err := DB.QueryRow(query, post.Username, post.Contact, post.Code, post.Date).Scan(&uuid)
+	var id int64
+	query := `INSERT INTO prexelposts (username, contact, contact_url, code, date) VALUES ($1, $2, $3, $4, $5) RETURNING id;`
+	err := DB.QueryRow(query, post.Username, post.Contact, post.ContactURL, post.Code, post.Date).Scan(&id)
 
 	if err != nil {
 		return 0, err
 	}
 
-	return uuid, nil
+	return id, nil
 }
 
-func GetPost(uuid int64) (PrexelPost, error) {
+func GetPost(id int64) (PrexelPost, error) {
 	var post PrexelPost
-	query := `SELECT uuid, username, contact, code, date FROM prexelposts WHERE uuid=$1;`
-	err := DB.QueryRow(query, uuid).Scan(&post.UUID, &post.Username, &post.Contact, &post.Code, &post.Date)
+	query := `SELECT id, username, contact, contact_url, code, date FROM prexelposts WHERE id=$1;`
+	err := DB.QueryRow(query, id).Scan(&post.ID, &post.Username, &post.Contact, &post.ContactURL, &post.Code, &post.Date)
 
 	if err != nil {
 		if err == sql.ErrNoRows {
@@ -33,17 +33,17 @@ func GetPost(uuid int64) (PrexelPost, error) {
 	return post, nil
 }
 
-func PollPosts(lastUUID *int64, limit int) ([]PrexelPost, error) {
+func PollPosts(lastID *int64, limit int) ([]PrexelPost, error) {
 	var posts []PrexelPost
 	var query string
 	var rows *sql.Rows
 	var err error
 
-	if lastUUID != nil {
-		query = `SELECT uuid, username, contact, code, date FROM prexelposts WHERE uuid > $1 ORDER BY uuid ASC LIMIT $2;`
-		rows, err = DB.Query(query, *lastUUID, limit)
+	if lastID != nil {
+		query = `SELECT id, username, contact, contact_url, code, date FROM prexelposts WHERE id > $1 ORDER BY id ASC LIMIT $2;`
+		rows, err = DB.Query(query, *lastID, limit)
 	} else {
-		query = `SELECT uuid, username, contact, code, date FROM prexelposts ORDER BY uuid ASC LIMIT $1;`
+		query = `SELECT id, username, contact, contact_url, code, date FROM prexelposts ORDER BY id ASC LIMIT $1;`
 		rows, err = DB.Query(query, limit)
 	}
 
@@ -55,7 +55,7 @@ func PollPosts(lastUUID *int64, limit int) ([]PrexelPost, error) {
 
 	for rows.Next() {
 		var post PrexelPost
-		if err := rows.Scan(&post.UUID, &post.Username, &post.Contact, &post.Code, &post.Date); err != nil {
+		if err := rows.Scan(&post.ID, &post.Username, &post.Contact, &post.ContactURL, &post.Code, &post.Date); err != nil {
 			return nil, err
 		}
 		posts = append(posts, post)

@@ -28,13 +28,13 @@ func CreatePostHandler(w http.ResponseWriter, r *http.Request) {
 
 	post.Date = time.Now()
 
-	uuid, err := db.CreatePost(post)
+	id, err := db.CreatePost(post)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
 
-	post.UUID = uuid
+	post.ID = id
 
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(post)

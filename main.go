@@ -33,7 +33,7 @@ func main() {
 	var router *mux.Router = mux.NewRouter()
 	router.HandleFunc("/posts", CreatePostHandler).Methods("POST")
 	router.HandleFunc("/posts", GetPostsHandler).Methods("GET")
-	router.HandleFunc("/posts/{uuid:[0-9]+}", GetPostHandler).Methods("GET")
+	router.HandleFunc("/posts/{id:[0-9]+}", GetPostHandler).Methods("GET")
 
 	serverPort := ":8080"
 	log.Info("Server is starting and listening on port " + serverPort)
