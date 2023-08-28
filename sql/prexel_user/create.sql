@@ -1,10 +1,12 @@
 -- @block
 -- Create Table
-CREATE TABLE prexelusers (
+CREATE TABLE prexel_users (
     id SERIAL PRIMARY KEY,
-    -- username VARCHAR(255) NOT NULL,
-    -- contact VARCHAR(255),
-    -- contact_url VARCHAR(1000),
+    email VARCHAR(255) NOT NULL,
+    service VARCHAR(255) NOT NULL,
+    username VARCHAR(255) NOT NULL,
+    contact VARCHAR(255),
+    contact_url VARCHAR(255),
     date TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 -- Create Indexes
