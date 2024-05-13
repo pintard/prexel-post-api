@@ -1,3 +1,3 @@
 -- @block
 -- Create Database
-CREATE DATABASE prexelpostdb;
+CREATE DATABASE prexeldb;
