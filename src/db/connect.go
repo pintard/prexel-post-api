@@ -3,7 +3,7 @@ package db
 import (
 	"database/sql"
 	"fmt"
-	. "prexel-post-api/utils"
+	. "prexel-post-api/src/utils"
 
 	_ "github.com/lib/pq"
 )

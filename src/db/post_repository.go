@@ -3,13 +3,17 @@ package db
 import (
 	"database/sql"
 	"errors"
-	. "prexel-post-api/model"
+	. "prexel-post-api/src/model"
+	"strings"
 )
 
 func CreatePost(post PrexelPost) (int64, error) {
 	var id int64
-	query := `INSERT INTO prexelposts (user_id, code, date) VALUES ($1, $2, $3) RETURNING id;`
-	err := DB.QueryRow(query, post.UserId, post.Code, post.Date).Scan(&id)
+	query := `
+		INSERT INTO prexelposts (user_id, code, date, title, tags, image_path)
+		VALUES ($1, $2, $3, $4, $5, $6)
+		RETURNING id;`
+	err := DB.QueryRow(query, post.UserId, post.Code, post.Date, post.Title, strings.Join(post.Tags, ","), post.ImagePath).Scan(&id)
 
 	if err != nil {
 		return 0, err

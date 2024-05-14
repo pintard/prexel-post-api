@@ -3,9 +3,9 @@ package main
 import (
 	"net/http"
 	"os"
-	"prexel-post-api/db"
-	handler "prexel-post-api/handler"
-	utils "prexel-post-api/utils"
+	"prexel-post-api/src/db"
+	handler "prexel-post-api/src/handler"
+	utils "prexel-post-api/src/utils"
 
 	"github.com/gorilla/mux"
 )

@@ -1,0 +1,4 @@
+CREATE TABLE prexel_tags (
+    id SERIAL PRIMARY KEY,
+    name VARCHAR(255) UNIQUE NOT NULL
+);

@@ -3,7 +3,7 @@ package db
 import (
 	"database/sql"
 	"errors"
-	. "prexel-post-api/model"
+	. "prexel-post-api/src/model"
 )
 
 func CreateUser(user PrexelUser) (int64, error) {

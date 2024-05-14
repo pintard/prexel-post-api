@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"net/http"
 	"net/url"
-	"prexel-post-api/db"
+	"prexel-post-api/src/db"
 	"strconv"
 )
 

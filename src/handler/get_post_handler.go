@@ -3,7 +3,7 @@ package handler
 import (
 	"encoding/json"
 	"net/http"
-	"prexel-post-api/db"
+	"prexel-post-api/src/db"
 	"strconv"
 
 	"github.com/gorilla/mux"
