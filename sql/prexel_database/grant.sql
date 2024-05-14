@@ -1,6 +1,6 @@
 -- @block
 -- Create User: psql -U postgres -d prexelpostdb
-CREATE USER prexeluser WITH PASSWORD 'password';
+CREATE USER prexel_user WITH PASSWORD 'password';
 -- @block
 -- Grant Permissions
 GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA public TO prexeluser;

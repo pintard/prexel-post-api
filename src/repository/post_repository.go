@@ -3,19 +3,51 @@ package repository
 import (
 	"database/sql"
 	"errors"
-	. "prexel-post-api/src/model"
+	"prexel-post-api/src/model"
 	"prexel-post-api/src/utils"
 	"strings"
 )
 
-func CreatePost(post PrexelPost) (int64, error) {
-	var id int64
-	query := `
-		INSERT INTO prexelposts (user_id, code, date, title, tags, image_path)
-		VALUES ($1, $2, $3, $4, $5, $6)
-		RETURNING id;`
-	err := utils.DB.QueryRow(query, post.UserId, post.Code, post.Date, post.Title, strings.Join(post.Tags, ","), post.ImagePath).Scan(&id)
+func CreatePost(post model.PrexelPost) (int64, error) {
+	for i, tag := range post.Tags {
+		post.Tags[i] = strings.TrimSpace(strings.ToLower(tag))
+	}
 
+	tx, err := utils.DB.Begin()
+	if err != nil {
+		return 0, err
+	}
+
+	var id int64
+
+	prexelPostQuery := `
+		INSERT INTO prexel_posts (user_id, date, code, title, image_path)
+		VALUES ($1, $2, $3, $4, $5)
+		RETURNING id;`
+
+	err = tx.QueryRow(prexelPostQuery, post.UserId, post.Date, post.Code, post.Title, post.ImagePath).Scan(&id)
+	if err != nil {
+		tx.Rollback()
+		return 0, err
+	}
+
+	for _, tagName := range post.Tags {
+		var tagID int64
+
+		err = tx.QueryRow("INSERT INTO prexel_tags (name) VALUES ($1) ON CONFLICT (name) DO UPDATE SET name=EXCLUDED.name RETURNING id;", tagName).Scan(&tagID)
+		if err != nil {
+			tx.Rollback()
+			return 0, err
+		}
+
+		_, err = tx.Exec("INSERT INTO prexel_post_tags (post_id, tag_id) VALUES ($1, $2);", id, tagID)
+		if err != nil {
+			tx.Rollback()
+			return 0, err
+		}
+	}
+
+	err = tx.Commit()
 	if err != nil {
 		return 0, err
 	}
@@ -23,32 +55,32 @@ func CreatePost(post PrexelPost) (int64, error) {
 	return id, nil
 }
 
-func GetPost(id int64) (PrexelPost, error) {
-	var post PrexelPost
-	query := `SELECT id, user_id, code, date FROM prexelposts WHERE id=$1;`
+func GetPost(id int64) (model.PrexelPost, error) {
+	var post model.PrexelPost
+	query := `SELECT id, user_id, code, date FROM model.PrexelPosts WHERE id=$1;`
 	err := utils.DB.QueryRow(query, id).Scan(&post.ID, &post.UserId, &post.Code, &post.Date)
 
 	if err != nil {
 		if err == sql.ErrNoRows {
-			return PrexelPost{}, errors.New("post not found")
+			return model.PrexelPost{}, errors.New("post not found")
 		}
-		return PrexelPost{}, err
+		return model.PrexelPost{}, err
 	}
 
 	return post, nil
 }
 
-func PollPosts(lastID *int64, limit int) ([]PrexelPost, error) {
-	var posts []PrexelPost
+func PollPosts(lastID *int64, limit int) ([]model.PrexelPost, error) {
+	var posts []model.PrexelPost
 	var query string
 	var rows *sql.Rows
 	var err error
 
 	if lastID != nil {
-		query = `SELECT id, user_id, code, date FROM prexelposts WHERE id > $1 ORDER BY id ASC LIMIT $2;`
+		query = `SELECT id, user_id, code, date FROM model.PrexelPosts WHERE id > $1 ORDER BY id ASC LIMIT $2;`
 		rows, err = utils.DB.Query(query, *lastID, limit)
 	} else {
-		query = `SELECT id, user_id, code, date FROM prexelposts ORDER BY id ASC LIMIT $1;`
+		query = `SELECT id, user_id, code, date FROM model.PrexelPosts ORDER BY id ASC LIMIT $1;`
 		rows, err = utils.DB.Query(query, limit)
 	}
 
@@ -59,7 +91,7 @@ func PollPosts(lastID *int64, limit int) ([]PrexelPost, error) {
 	defer rows.Close()
 
 	for rows.Next() {
-		var post PrexelPost
+		var post model.PrexelPost
 		if err := rows.Scan(&post.ID, &post.UserId, &post.Code, &post.Date); err != nil {
 			return nil, err
 		}

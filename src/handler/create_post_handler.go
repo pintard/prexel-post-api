@@ -31,12 +31,12 @@ func CreatePostHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	post := model.PrexelPost{
-		UserId:    mustParseInt64(r.FormValue("user_id")),
+		UserId:    parseInt64(r.FormValue("user_id")),
+		Date:      time.Now(),
 		Code:      r.FormValue("code"),
 		Title:     r.FormValue("title"),
 		Tags:      strings.Split(r.FormValue("tags"), ","),
 		ImagePath: imagePath,
-		Date:      time.Now(),
 	}
 
 	id, err := repository.CreatePost(post)
@@ -51,7 +51,7 @@ func CreatePostHandler(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(post)
 }
 
-func mustParseInt64(s string) int64 {
+func parseInt64(s string) int64 {
 	i, _ := strconv.ParseInt(s, 10, 64)
 	return i
 }
