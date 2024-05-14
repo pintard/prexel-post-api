@@ -1,9 +1,8 @@
-package db
+package utils
 
 import (
 	"database/sql"
 	"fmt"
-	. "prexel-post-api/src/utils"
 
 	_ "github.com/lib/pq"
 )

@@ -1,7 +1,7 @@
 package utils
 
 import (
-	"log"
+	logger "log"
 	"sync"
 
 	"github.com/fatih/color"
@@ -20,15 +20,15 @@ func GetLoggerInstance() (instance *Logger) {
 
 func (l *Logger) Info(msg string) {
 	blue := color.New(color.FgBlue).SprintFunc()
-	log.Println(blue("[INFO]"), msg)
+	logger.Println(blue("[INFO]"), msg)
 }
 
 func (l *Logger) Warning(msg string) {
 	yellow := color.New(color.FgYellow).SprintFunc()
-	log.Println(yellow("[WARNING]"), msg)
+	logger.Println(yellow("[WARNING]"), msg)
 }
 
 func (l *Logger) Error(msg string) {
 	red := color.New(color.FgRed).SprintFunc()
-	log.Println(red("[ERROR]"), msg)
+	logger.Println(red("[ERROR]"), msg)
 }

@@ -1,9 +1,10 @@
-package db
+package repository
 
 import (
 	"database/sql"
 	"errors"
 	. "prexel-post-api/src/model"
+	"prexel-post-api/src/utils"
 	"strings"
 )
 
@@ -13,7 +14,7 @@ func CreatePost(post PrexelPost) (int64, error) {
 		INSERT INTO prexelposts (user_id, code, date, title, tags, image_path)
 		VALUES ($1, $2, $3, $4, $5, $6)
 		RETURNING id;`
-	err := DB.QueryRow(query, post.UserId, post.Code, post.Date, post.Title, strings.Join(post.Tags, ","), post.ImagePath).Scan(&id)
+	err := utils.DB.QueryRow(query, post.UserId, post.Code, post.Date, post.Title, strings.Join(post.Tags, ","), post.ImagePath).Scan(&id)
 
 	if err != nil {
 		return 0, err
@@ -25,7 +26,7 @@ func CreatePost(post PrexelPost) (int64, error) {
 func GetPost(id int64) (PrexelPost, error) {
 	var post PrexelPost
 	query := `SELECT id, user_id, code, date FROM prexelposts WHERE id=$1;`
-	err := DB.QueryRow(query, id).Scan(&post.ID, &post.UserId, &post.Code, &post.Date)
+	err := utils.DB.QueryRow(query, id).Scan(&post.ID, &post.UserId, &post.Code, &post.Date)
 
 	if err != nil {
 		if err == sql.ErrNoRows {
@@ -45,10 +46,10 @@ func PollPosts(lastID *int64, limit int) ([]PrexelPost, error) {
 
 	if lastID != nil {
 		query = `SELECT id, user_id, code, date FROM prexelposts WHERE id > $1 ORDER BY id ASC LIMIT $2;`
-		rows, err = DB.Query(query, *lastID, limit)
+		rows, err = utils.DB.Query(query, *lastID, limit)
 	} else {
 		query = `SELECT id, user_id, code, date FROM prexelposts ORDER BY id ASC LIMIT $1;`
-		rows, err = DB.Query(query, limit)
+		rows, err = utils.DB.Query(query, limit)
 	}
 
 	if err != nil {

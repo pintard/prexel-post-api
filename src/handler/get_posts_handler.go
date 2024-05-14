@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"net/http"
 	"net/url"
-	"prexel-post-api/src/db"
+	"prexel-post-api/src/repository"
 	"strconv"
 )
 
@@ -34,7 +34,7 @@ func GetPostsHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	posts, err := db.PollPosts(lastID, limit)
+	posts, err := repository.PollPosts(lastID, limit)
 	if err != nil {
 		http.Error(w, "Error retrieving posts", http.StatusInternalServerError)
 		return

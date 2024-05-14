@@ -3,7 +3,7 @@ package handler
 import (
 	"encoding/json"
 	"net/http"
-	"prexel-post-api/src/db"
+	"prexel-post-api/src/repository"
 	"prexel-post-api/src/model"
 	"prexel-post-api/src/service"
 	"strconv"
@@ -39,7 +39,7 @@ func CreatePostHandler(w http.ResponseWriter, r *http.Request) {
 		Date:      time.Now(),
 	}
 
-	id, err := db.CreatePost(post)
+	id, err := repository.CreatePost(post)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return

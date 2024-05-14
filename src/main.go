@@ -3,9 +3,8 @@ package main
 import (
 	"net/http"
 	"os"
-	"prexel-post-api/src/db"
-	handler "prexel-post-api/src/handler"
-	utils "prexel-post-api/src/utils"
+	"prexel-post-api/src/handler"
+	"prexel-post-api/src/utils"
 
 	"github.com/gorilla/mux"
 )
@@ -21,14 +20,14 @@ var (
 var log *utils.Logger = utils.GetLoggerInstance()
 
 func main() {
-	var err error = db.Connect(host, port, user, password, dbname)
+	var err error = utils.Connect(host, port, user, password, dbname)
 
 	if err != nil {
 		log.Error("Error connecting to the database: " + err.Error())
 		os.Exit(1)
 	}
 
-	defer db.DB.Close()
+	defer utils.DB.Close()
 
 	var router *mux.Router = mux.NewRouter()
 	router.HandleFunc("/posts", handler.CreatePostHandler).Methods("POST")
