@@ -4,8 +4,10 @@ FROM pg_stat_activity
 WHERE pg_stat_activity.datname = 'prexeldb'
   AND pid <> pg_backend_pid();
 
+-- @block
 DROP DATABASE IF EXISTS prexeldb;
 
+-- @block
 DO $$ BEGIN
     IF EXISTS (SELECT 1 FROM pg_roles WHERE rolname = 'prexel_user') THEN
         DROP USER prexel_user;

@@ -1,6 +1,6 @@
 DO $$ BEGIN
     IF NOT EXISTS (SELECT 1 FROM pg_roles WHERE rolname = 'prexel_user') THEN
-        CREATE USER prexel_user WITH PASSWORD 'securepassword';
+        CREATE USER prexel_user WITH PASSWORD 'password';
     END IF;
 END $$;
 

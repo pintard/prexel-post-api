@@ -12,9 +12,9 @@ import (
 var (
 	host     = utils.GetEnv("DB_HOST", "localhost")
 	port     = utils.GetEnv("DB_PORT", "5432")
-	user     = utils.GetEnv("DB_USER", "prexeluser")
+	user     = utils.GetEnv("DB_USER", "prexel_user")
 	password = utils.GetEnv("DB_PASSWORD", "password")
-	dbname   = utils.GetEnv("DB_NAME", "prexelpostdb")
+	dbname   = utils.GetEnv("DB_NAME", "prexeldb")
 )
 
 var log *utils.Logger = utils.GetLoggerInstance()
@@ -30,9 +30,10 @@ func main() {
 	defer utils.DB.Close()
 
 	var router *mux.Router = mux.NewRouter()
-	router.HandleFunc("/posts", handler.CreatePostHandler).Methods("POST")
-	router.HandleFunc("/posts", handler.GetPostsHandler).Methods("GET")
-	router.HandleFunc("/posts/{id:[0-9]+}", handler.GetPostHandler).Methods("GET")
+	apiRouter := router.PathPrefix("/api").Subrouter()
+	apiRouter.HandleFunc("/posts", handler.CreatePostHandler).Methods("POST")
+	apiRouter.HandleFunc("/posts", handler.GetPostsHandler).Methods("GET")
+	apiRouter.HandleFunc("/posts/{id:[0-9]+}", handler.GetPostHandler).Methods("GET")
 
 	serverPort := ":8080"
 	log.Info("Server is starting and listening on port " + serverPort)

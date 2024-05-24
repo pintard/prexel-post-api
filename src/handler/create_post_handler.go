@@ -3,8 +3,8 @@ package handler
 import (
 	"encoding/json"
 	"net/http"
-	"prexel-post-api/src/repository"
 	"prexel-post-api/src/model"
+	"prexel-post-api/src/repository"
 	"prexel-post-api/src/service"
 	"strconv"
 	"strings"
@@ -31,12 +31,13 @@ func CreatePostHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	post := model.PrexelPost{
-		UserId:    parseInt64(r.FormValue("user_id")),
-		Date:      time.Now(),
-		Code:      r.FormValue("code"),
-		Title:     r.FormValue("title"),
-		Tags:      strings.Split(r.FormValue("tags"), ","),
-		ImagePath: imagePath,
+		UserId:     parseInt64(r.FormValue("user_id")),
+		Code:       r.FormValue("code"),
+		Title:      r.FormValue("title"),
+		Tags:       strings.Split(r.FormValue("tags"), ","),
+		ImagePath:  imagePath,
+		CreateDate: time.Now(),
+		UpdateDate: time.Now(),
 	}
 
 	id, err := repository.CreatePost(post)

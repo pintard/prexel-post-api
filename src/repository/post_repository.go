@@ -21,11 +21,11 @@ func CreatePost(post model.PrexelPost) (int64, error) {
 	var id int64
 
 	prexelPostQuery := `
-		INSERT INTO prexel_posts (user_id, date, code, title, image_path)
-		VALUES ($1, $2, $3, $4, $5)
+		INSERT INTO prexel_posts (user_id, code, title, image_path, create_date, update_date)
+		VALUES ($1, $2, $3, $4, $5, $6)
 		RETURNING id;`
 
-	err = tx.QueryRow(prexelPostQuery, post.UserId, post.Date, post.Code, post.Title, post.ImagePath).Scan(&id)
+	err = tx.QueryRow(prexelPostQuery, post.UserId, post.Code, post.Title, post.ImagePath, post.CreateDate, post.UpdateDate).Scan(&id)
 	if err != nil {
 		tx.Rollback()
 		return 0, err
@@ -57,8 +57,8 @@ func CreatePost(post model.PrexelPost) (int64, error) {
 
 func GetPost(id int64) (model.PrexelPost, error) {
 	var post model.PrexelPost
-	query := `SELECT id, user_id, code, date FROM model.PrexelPosts WHERE id=$1;`
-	err := utils.DB.QueryRow(query, id).Scan(&post.ID, &post.UserId, &post.Code, &post.Date)
+	query := `SELECT id, user_id, code, create_date, update_date FROM model.PrexelPosts WHERE id=$1;`
+	err := utils.DB.QueryRow(query, id).Scan(&post.ID, &post.UserId, &post.Code, &post.CreateDate, &post.UpdateDate)
 
 	if err != nil {
 		if err == sql.ErrNoRows {
@@ -92,7 +92,7 @@ func PollPosts(lastID *int64, limit int) ([]model.PrexelPost, error) {
 
 	for rows.Next() {
 		var post model.PrexelPost
-		if err := rows.Scan(&post.ID, &post.UserId, &post.Code, &post.Date); err != nil {
+		if err := rows.Scan(&post.ID, &post.UserId, &post.Code, &post.Title, post.ImagePath, post.CreateDate, post.UpdateDate); err != nil {
 			return nil, err
 		}
 		posts = append(posts, post)
