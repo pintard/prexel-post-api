@@ -1,4 +1,3 @@
--- @block
 CREATE TABLE IF NOT EXISTS prexel_posts (
     id SERIAL PRIMARY KEY,
     user_id INT NOT NULL ,

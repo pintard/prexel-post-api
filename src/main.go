@@ -5,25 +5,27 @@ import (
 	"os"
 	"prexel-post-api/src/handler"
 	"prexel-post-api/src/utils"
+	"prexel-post-api/src/utils/logger"
 
 	"github.com/gorilla/mux"
 )
 
-var (
-	host     = utils.GetEnv("DB_HOST", "localhost")
-	port     = utils.GetEnv("DB_PORT", "5432")
-	user     = utils.GetEnv("DB_USER", "prexel_user")
-	password = utils.GetEnv("DB_PASSWORD", "password")
-	dbname   = utils.GetEnv("DB_NAME", "prexeldb")
-)
-
-var log *utils.Logger = utils.GetLoggerInstance()
-
 func main() {
-	var err error = utils.Connect(host, port, user, password, dbname)
-
+	config, err := utils.LoadConfig()
 	if err != nil {
-		log.Error("Error connecting to the database: " + err.Error())
+		logger.Log.Error("Error loading configuration: " + err.Error())
+		os.Exit(1)
+	}
+
+	if err := utils.InitDB(config); err != nil {
+		logger.Log.Error("Error initializing the database: " + err.Error())
+		os.Exit(1)
+	}
+
+	defer utils.CleanupDB(config)
+
+	if err := utils.Connect(config.DBHost, config.DBPort, config.DBUser, config.DBPassword, config.DBName); err != nil {
+		logger.Log.Error("Error connecting to the database: " + err.Error())
 		os.Exit(1)
 	}
 
@@ -36,6 +38,8 @@ func main() {
 	apiRouter.HandleFunc("/posts/{id:[0-9]+}", handler.GetPostHandler).Methods("GET")
 
 	serverPort := ":8080"
-	log.Info("Server is starting and listening on port " + serverPort)
-	http.ListenAndServe(serverPort, router)
+	logger.Log.Info("Server is starting and listening on port " + serverPort)
+	if err := http.ListenAndServe(serverPort, router); err != nil {
+		logger.Log.Error("Server failed: " + err.Error())
+	}
 }

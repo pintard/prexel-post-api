@@ -1,5 +1,1 @@
--- @block
--- Select all
-SELECT *
-FROM prexelposts
-ORDER BY date DESC;
+SELECT * FROM prexel_posts ORDER BY create_date DESC;
