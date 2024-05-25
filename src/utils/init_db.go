@@ -19,12 +19,22 @@ func runSQLScript(user, password, filePath string) error {
 func InitDB(config *Config) error {
 	logger.Log.Info("Initializing the database...")
 
-	if err := runSQLScript(config.DBUser, config.DBPassword, filepath.Join("sql", "prexel_database", "create.sql")); err != nil {
-		return fmt.Errorf("Error creating user or database: %v", err)
+	wd, err := os.Getwd()
+	if err != nil {
+		return fmt.Errorf("could not get working directory: %v", err)
 	}
 
-	if err := runSQLScript(config.DBUser, config.DBPassword, filepath.Join("sql", "prexel_database", "grant.sql")); err != nil {
-		return fmt.Errorf("Error granting privileges: %v", err)
+	createSQLPath := filepath.Join(wd, "sql", "prexel_database", "create.sql")
+	grantSQLPath := filepath.Join(wd, "sql", "prexel_database", "grant.sql")
+	adminUser := GetEnv("ADMIN_USER", "postgres")
+	adminPassword := GetEnv("ADMIN_PASSWORD", "password")
+
+	if err := runSQLScript(adminUser, adminPassword, createSQLPath); err != nil {
+		return fmt.Errorf("error creating user or database: %v", err)
+	}
+
+	if err := runSQLScript(adminUser, adminPassword, grantSQLPath); err != nil {
+		return fmt.Errorf("error granting privileges: %v", err)
 	}
 
 	directories := []string{
@@ -35,10 +45,10 @@ func InitDB(config *Config) error {
 	}
 
 	for _, dir := range directories {
-		scriptPath := filepath.Join(dir, "create.sql")
+		scriptPath := filepath.Join(wd, dir, "create.sql")
 		logger.Log.Info(fmt.Sprintf("Executing script: %s", scriptPath))
 		if err := runSQLScript(config.DBUser, config.DBPassword, scriptPath); err != nil {
-			return fmt.Errorf("Error creating table in directory %s: %v", dir, err)
+			return fmt.Errorf("error creating table in directory %s: %v", dir, err)
 		}
 	}
 
@@ -49,7 +59,17 @@ func InitDB(config *Config) error {
 func CleanupDB(config *Config) {
 	logger.Log.Info("Cleaning up the database...")
 
-	if err := runSQLScript(config.DBUser, config.DBPassword, filepath.Join("sql", "prexel_database", "delete.sql")); err != nil {
+	wd, err := os.Getwd()
+	if err != nil {
+		logger.Log.Error(fmt.Sprintf("could not get working directory: %v", err))
+		return
+	}
+
+	deleteSQLPath := filepath.Join(wd, "sql", "prexel_database", "delete.sql")
+	adminUser := GetEnv("ADMIN_USER", "postgres")
+	adminPassword := GetEnv("ADMIN_PASSWORD", "password")
+
+	if err := runSQLScript(adminUser, adminPassword, deleteSQLPath); err != nil {
 		logger.Log.Error(fmt.Sprintf("Error deleting user or database: %v", err))
 	} else {
 		logger.Log.Success("Database cleanup completed successfully.")

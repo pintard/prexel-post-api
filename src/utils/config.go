@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"os"
+	"path/filepath"
 )
 
 type Config struct {
@@ -15,7 +16,13 @@ type Config struct {
 }
 
 func LoadConfig() (*Config, error) {
-	file, err := os.Open("config.json")
+	wd, err := os.Getwd()
+	if err != nil {
+		return nil, fmt.Errorf("could not get working directory: %v", err)
+	}
+
+	configPath := filepath.Join(wd, "utils", "config.json")
+	file, err := os.Open(configPath)
 	if err != nil {
 		return nil, fmt.Errorf("could not open config file: %v", err)
 	}
@@ -24,7 +31,7 @@ func LoadConfig() (*Config, error) {
 	config := &Config{}
 	decoder := json.NewDecoder(file)
 	if err := decoder.Decode(config); err != nil {
-		return nil, fmt.Errorf("Could not decode config file: %v", err)
+		return nil, fmt.Errorf("could not decode config file: %v", err)
 	}
 
 	config.DBHost = GetEnv("DB_HOST", config.DBHost)
