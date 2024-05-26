@@ -6,6 +6,7 @@ import (
 	"prexel-post-api/src/model"
 	"prexel-post-api/src/repository"
 	"prexel-post-api/src/service"
+	"prexel-post-api/src/utils/logger"
 	"strconv"
 	"strings"
 	"time"
@@ -14,6 +15,7 @@ import (
 func CreatePostHandler(w http.ResponseWriter, r *http.Request) {
 	err := r.ParseMultipartForm(10 << 20)
 	if err != nil {
+		logger.Log.Error("Failed to parse multipart form: " + err.Error())
 		http.Error(w, "Failed to parse multipart form", http.StatusBadRequest)
 		return
 	}
@@ -25,6 +27,7 @@ func CreatePostHandler(w http.ResponseWriter, r *http.Request) {
 
 	file, header, err := r.FormFile("image")
 	if err != nil {
+		logger.Log.Error("Failed to get the file: " + err.Error())
 		http.Error(w, "Failed to get the file", http.StatusBadRequest)
 		return
 	}
@@ -32,6 +35,7 @@ func CreatePostHandler(w http.ResponseWriter, r *http.Request) {
 
 	imagePath, err := service.UploadImage(file, header.Filename)
 	if err != nil {
+		logger.Log.Error("Failed to upload image: " + err.Error())
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
@@ -48,16 +52,22 @@ func CreatePostHandler(w http.ResponseWriter, r *http.Request) {
 
 	id, err := repository.CreatePost(post)
 	if err != nil {
+		logger.Log.Error("Failed to create post: " + err.Error())
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 	post.ID = id
+
+	logger.Log.Info("Post created successfully with ID: " + strconv.FormatInt(post.ID, 10))
 
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(post)
 }
 
 func parseInt64(s string) int64 {
-	i, _ := strconv.ParseInt(s, 10, 64)
+	i, err := strconv.ParseInt(s, 10, 64)
+	if err != nil {
+		logger.Log.Error("Failed to parse int64: " + err.Error())
+	}
 	return i
 }
