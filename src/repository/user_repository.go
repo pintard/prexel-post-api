@@ -5,6 +5,7 @@ import (
 	"errors"
 	"prexel-post-api/src/model"
 	"prexel-post-api/src/utils"
+	"prexel-post-api/src/utils/logger"
 )
 
 func CreateUser(user model.PrexelUser) (int64, error) {
@@ -32,4 +33,15 @@ func GetUser(id int64) (model.PrexelUser, error) {
 	}
 
 	return user, nil
+}
+
+func UserExists(userID int64) (bool, error) {
+	var exists bool
+	query := `SELECT EXISTS (SELECT 1 FROM prexel_users WHERE id = $1)`
+	err := utils.DB.QueryRow(query, userID).Scan(&exists)
+	if err != nil {
+		logger.Log.Error("Error checking user existence: " + err.Error())
+		return false, err
+	}
+	return exists, nil
 }

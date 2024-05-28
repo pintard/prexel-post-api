@@ -62,7 +62,7 @@ func main() {
 
 func setupRouter() *mux.Router {
 	var router *mux.Router = mux.NewRouter()
-	apiRouter := router.PathPrefix("/api").Subrouter()
+	apiRouter := router.PathPrefix("/api/v1").Subrouter()
 	apiRouter.HandleFunc("/posts", handler.CreatePostHandler).Methods("POST")
 	apiRouter.HandleFunc("/posts", handler.GetPostsHandler).Methods("GET")
 	apiRouter.HandleFunc("/posts/{id:[0-9]+}", handler.GetPostHandler).Methods("GET")

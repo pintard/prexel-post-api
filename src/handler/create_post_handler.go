@@ -25,6 +25,18 @@ func CreatePostHandler(w http.ResponseWriter, r *http.Request) {
 	title := r.FormValue("title")
 	tags := r.FormValue("tags")
 
+	userExists, err := repository.UserExists(userId)
+	if err != nil {
+		logger.Log.Error("Failed to find user: " + err.Error())
+		http.Error(w, "Failed to find user", http.StatusInternalServerError)
+		return
+	}
+	if !userExists {
+		logger.Log.Error("User does not exist: " + strconv.FormatInt(userId, 10))
+		http.Error(w, "User does not exist", http.StatusBadRequest)
+		return
+	}
+
 	file, header, err := r.FormFile("image")
 	if err != nil {
 		logger.Log.Error("Failed to get the file: " + err.Error())
@@ -57,8 +69,6 @@ func CreatePostHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	post.ID = id
-
-	logger.Log.Info("Post created successfully with ID: " + strconv.FormatInt(post.ID, 10))
 
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(post)

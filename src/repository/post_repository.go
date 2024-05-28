@@ -5,16 +5,21 @@ import (
 	"errors"
 	"prexel-post-api/src/model"
 	"prexel-post-api/src/utils"
+	"prexel-post-api/src/utils/logger"
+	"strconv"
 	"strings"
 )
 
 func CreatePost(post model.PrexelPost) (int64, error) {
+	logger.Log.Info("Creating post for user ID: " + strconv.FormatInt(post.UserId, 10))
+
 	for i, tag := range post.Tags {
 		post.Tags[i] = strings.TrimSpace(strings.ToLower(tag))
 	}
 
 	tx, err := utils.DB.Begin()
 	if err != nil {
+		logger.Log.Error("Failed to begin transaction: " + err.Error())
 		return 0, err
 	}
 
@@ -28,6 +33,7 @@ func CreatePost(post model.PrexelPost) (int64, error) {
 	err = tx.QueryRow(prexelPostQuery, post.UserId, post.Code, post.Title, post.ImagePath, post.CreateDate, post.UpdateDate).Scan(&id)
 	if err != nil {
 		tx.Rollback()
+		logger.Log.Error("Failed to insert post: " + err.Error())
 		return 0, err
 	}
 
@@ -37,21 +43,25 @@ func CreatePost(post model.PrexelPost) (int64, error) {
 		err = tx.QueryRow("INSERT INTO prexel_tags (name) VALUES ($1) ON CONFLICT (name) DO UPDATE SET name=EXCLUDED.name RETURNING id;", tagName).Scan(&tagID)
 		if err != nil {
 			tx.Rollback()
+			logger.Log.Error("Failed to insert tag: " + err.Error())
 			return 0, err
 		}
 
 		_, err = tx.Exec("INSERT INTO prexel_post_tags (post_id, tag_id) VALUES ($1, $2);", id, tagID)
 		if err != nil {
 			tx.Rollback()
+			logger.Log.Error("Failed to insert post tag: " + err.Error())
 			return 0, err
 		}
 	}
 
 	err = tx.Commit()
 	if err != nil {
+		logger.Log.Error("Failed to commit transaction: " + err.Error())
 		return 0, err
 	}
 
+	logger.Log.Success("Post created successfully with ID: " + strconv.FormatInt(id, 10))
 	return id, nil
 }
 
