@@ -7,6 +7,8 @@ require (
 	github.com/lib/pq v1.10.9
 )
 
+require github.com/rs/cors v1.11.0 // indirect
+
 require (
 	github.com/fatih/color v1.15.0
 	github.com/mattn/go-colorable v0.1.13 // indirect

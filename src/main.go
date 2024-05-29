@@ -10,6 +10,7 @@ import (
 	"syscall"
 
 	"github.com/gorilla/mux"
+	"github.com/rs/cors"
 )
 
 func main() {
@@ -34,10 +35,11 @@ func main() {
 	signal.Notify(stopChan, os.Interrupt, syscall.SIGTERM)
 
 	router := setupRouter()
+	handler := cors.Default().Handler(router)
 	serverPort := ":8080"
 	server := &http.Server{
 		Addr:    serverPort,
-		Handler: router,
+		Handler: handler,
 	}
 
 	go func() {
